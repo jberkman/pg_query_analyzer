@@ -5,11 +5,14 @@ require File.dirname(__FILE__) + '/lib/query_analyzer'
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
 $hoe = Hoe.new('query_analyzer', QueryAnalyzer::VERSION) do |p|
   p.developer('Marcos Piccinini', 'x@nofxx.com')
-  #p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
+  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   p.post_install_message = 'PostInstall.txt'
   p.rubyforge_name       = p.name
+  p.description          = "Append sql explain statements to your rails console/log files."
+  p.summary              = "Append sql explain statements to your rails console/log files."
+  p.url                  = "http://github.com/nofxx/query_analyzer"
   p.extra_deps         = [
-    ['activerecord','>= 2.0.2'],
+    ['activerecord','>= 1.2.3'],
   ]
   p.extra_dev_deps = [
     ['newgem', ">= #{::Newgem::VERSION}"]
