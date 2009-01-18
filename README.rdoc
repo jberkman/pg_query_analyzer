@@ -1,10 +1,4 @@
-= Query Analyzer Plugin for Rails
-
-MODIFIED by John Eberly originally take from http://svn.nfectio.us
-
-PG/ORACLE by Luca Mearelli
-
-Cooked and gemified by Marcos Piccinini
+= Query |A|n|a|l|y|z|e|r| for Rails
 
 The Query Analyzer plugin will expand the usability of your log files and/or
 console by providing your dbms`s query analysis.
@@ -97,6 +91,12 @@ find the single row that matched, preventing the full table scan.
 
 
 == Credits:
+
+MODIFIED by John Eberly originally take from http://svn.nfectio.us
+
+PG/ORACLE by Luca Mearelli
+
+Cooked and gemified by Marcos Piccinini
 
 The extension of the Array class for printing the columnized records was originally
 written by Peter Cooper who adapted it from Courtenay from #caboose.

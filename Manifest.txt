@@ -1,9 +1,11 @@
 History.txt
+MIT-LICENSE
 Manifest.txt
 PostInstall.txt
 README.rdoc
 Rakefile
 lib/query_analyzer.rb
+query_analyzer.gemspec
 rails/init.rb
 script/console
 script/destroy

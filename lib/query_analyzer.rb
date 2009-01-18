@@ -1,13 +1,23 @@
-$:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
-
+#
+# Query Analyzer
+#
+#
+# Original MySQL plugin:
+# http://github.com/jeberly/query-analyzer
 #
 # PostgreSQL/Oracle Adapter by:
 # http://spazidigitali.com/2006/12/01/rails-query-analyzer-plugin-now-also-on-oracle-and-postgresql/
 #
+# Usage:
+#
+#    config.gem "query_analyzer"
+#
+#
+$:.unshift(File.dirname(__FILE__)) unless
+  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 module QueryAnalyzer
-  VERSION = '0.0.1'
+  VERSION = '0.1.2'
 end
 
 class Array
@@ -31,13 +41,12 @@ class Array
     end
 
     table = []
-    table << qa_columnized_row(self.first.keys, sized)
+    table << qa_columnized_row(self.first ? self.first.keys : "No Analysis Information", sized)
     table << '-' * table.first.length
     self.each { |row| table << qa_columnized_row(row.values, sized) }
     table.join("\n   ") # Spaces added to work with format_log_entry
   end
 end
-
 
 #
 # Connection Adapters
@@ -72,11 +81,11 @@ module ActiveRecord
     # Oracle
     #
     class OracleAdapter < AbstractAdapter
-        #Name of plan table, default value 'PLAN_TABLE'.
+        # Name of plan table, default value 'PLAN_TABLE'.
         cattr_accessor :plan_table_name
         @@plan_table_name = 'PLAN_TABLE'
 
-        #Plan details to use:
+        # Plan details to use:
         # BASIC ..... displays minimum information
         # TYPICAL ... displays most relevant information
         # SERIAL .... like TYPICAL but without parallel information
@@ -87,7 +96,7 @@ module ActiveRecord
       private
         alias_method :select_without_analyzer, :select
 
-        #Query to output the computed plan using the dbms_xplan package (available from Oracle 9i onwards)
+        # Query to output the computed plan using the dbms_xplan package (available from Oracle 9i onwards)
         def plan_query
           "select plan_table_output from table(dbms_xplan.display('#{@@plan_table_name}',null,'#{@@plan_details}'))"
         end
@@ -123,27 +132,61 @@ module ActiveRecord
         #rather than just a summary. Usually this option is only
         #useful for specialized debugging purposes.
         #The VERBOSE output is either pretty-printed or not,
-        #depending on the setting of the explain_pretty_print configuration parameter.
+        #depending on the setting of the explain_pretty_print
+        #configuration parameter.
         cattr_accessor :explain_verbose
       @@explain_verbose = nil
 
       private
 
-      alias_method :select_without_analyzer, :select
+        alias_method :select_without_analyzer, :select
 
-      def select(sql, name = nil)
-        query_results = select_without_analyzer(sql, name)
+        def select(sql, name = nil)
+          query_results = select_without_analyzer(sql, name)
 
-        if @logger and @logger.level <= Logger::INFO
+         if @logger and @logger.level <= Logger::INFO
           @logger.debug(@logger.silence do
             format_log_entry("Analyzing #{name}\n",
             "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} #{'verbose' if @@explain_verbose} #{sql}", name).qa_columnized}\n")
           end) if sql =~ /^select/i
-        end
+         end
 
         query_results
 
-      end
+
+        end
+
+    end
+
+    #
+    # SQLite / SQLite3
+    #
+    # Pretty useless... nothing to do on a sunday, you know...
+    #
+    class SQLiteAdapter < AbstractAdapter
+      # Name of stats table, default value 'sqlite_stat1'.
+      cattr_accessor :stat_table_name
+      @@stat_table_name = 'sqlite_stat1'
+
+       private
+         alias_method :select_without_analyzer, :select
+
+         def select(sql, name = nil)
+           query_results = select_without_analyzer(sql, name)
+           from_table = name.split(" ").first.downcase.pluralize
+           select_without_analyzer("ANALYZE #{from_table}")
+
+           if @logger and @logger.level <= Logger::INFO
+             @logger.debug(
+               @logger.silence do
+                 format_log_entry("Analyzing #{name}\n",
+                  "#{select_without_analyzer("SELECT * FROM #{@@stat_table_name} WHERE tbl LIKE \"#{from_table}\"", name).qa_columnized}\n")
+               end) if sql =~ /^select/i
+            end
+
+          query_results
+
+        end
 
     end
 

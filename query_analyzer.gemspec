@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{query_analyzer}
-  s.version = "0.0.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marcos Piccinini"]
@@ -10,9 +10,9 @@ Gem::Specification.new do |s|
   s.description = %q{}
   s.email = ["x@nofxx.com"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "PostInstall.txt", "README.rdoc"]
-  s.files = ["History.txt", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "lib/query_analyzer.rb", "rails/init.rb", "script/console", "script/destroy", "script/generate", "spec/query_analyzer_spec.rb", "spec/spec.opts", "spec/spec_helper.rb", "tasks/rspec.rake"]
+  s.files = ["History.txt", "MIT-LICENSE", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "lib/query_analyzer.rb", "query_analyzer.gemspec", "rails/init.rb", "script/console", "script/destroy", "script/generate", "spec/query_analyzer_spec.rb", "spec/spec.opts", "spec/spec_helper.rb", "tasks/rspec.rake"]
   s.has_rdoc = true
-  s.homepage = %q{MODIFIED by John Eberly originally take from http://svn.nfectio.us}
+  s.homepage = %q{The Query Analyzer plugin will expand the usability of your log files and/or}
   s.post_install_message = %q{PostInstall.txt}
   s.rdoc_options = ["--main", "README.rdoc"]
   s.require_paths = ["lib"]
