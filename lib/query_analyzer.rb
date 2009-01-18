@@ -46,6 +46,15 @@ class Array
     self.each { |row| table << qa_columnized_row(row.values, sized) }
     table.join("\n   ") # Spaces added to work with format_log_entry
   end
+
+  def qa_pgrows
+    out = []
+    self.each_with_index do |row, i|
+      out[i] = " " * i
+      row.values.each_with_index { |value, j| out[i] << "#{" " * j} -> #{value}\n" }
+    end
+    out.join("\n  ")
+  end
 end
 
 #
@@ -148,7 +157,7 @@ module ActiveRecord
            @logger.debug(@logger.silence do
              format_log_entry("Analyzing #{name}\n\n",
              "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} "+
-             "#{'verbose' if @@explain_verbose} #{sql}", name).qa_columnized}\n")
+             "#{'verbose' if @@explain_verbose} #{sql}", name).qa_pgrows}\n")
            end) if sql =~ /^select/i
           end
         query_results
