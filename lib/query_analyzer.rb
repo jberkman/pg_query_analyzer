@@ -17,7 +17,20 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 module QueryAnalyzer
-  VERSION = '0.1.5'
+  VERSION = '0.1.7'
+end
+
+module CommonAnalyzer
+  @@analyzer_debug = 0..2
+  @@analyzer_warn  = 3..7
+
+  def select_logger time_spent, log
+    case time_spent
+    when @@analyzer_debug then @logger.debug(log)
+    when @@analyzer_warn  then @logger.warn(log)
+    else @logger.fatal(log)
+    end
+  end
 end
 
 class Array
@@ -127,19 +140,21 @@ module ActiveRecord
     # PostgreSQL
     #
     class PostgreSQLAdapter < AbstractAdapter
-        # if true then uses the ANALYZE option which (from postgresql manual):
-        #Carry out the command and show the actual run times.
-        cattr_accessor :explain_analyze
-        @@explain_analyze = nil
+      include CommonAnalyzer
 
-        #if true then uses the VERBOSE option which  (from postgresql manual):
-        #Shows the full internal representation of the plan tree,
-        #rather than just a summary. Usually this option is only
-        #useful for specialized debugging purposes.
-        #The VERBOSE output is either pretty-printed or not,
-        #depending on the setting of the explain_pretty_print
-        #configuration parameter.
-        cattr_accessor :explain_verbose
+      # if true then uses the ANALYZE option which (from postgresql manual):
+      #Carry out the command and show the actual run times.
+      cattr_accessor :explain_analyze
+      @@explain_analyze = nil
+
+      #if true then uses the VERBOSE option which  (from postgresql manual):
+      #Shows the full internal representation of the plan tree,
+      #rather than just a summary. Usually this option is only
+      #useful for specialized debugging purposes.
+      #The VERBOSE output is either pretty-printed or not,
+      #depending on the setting of the explain_pretty_print
+      #configuration parameter.
+      cattr_accessor :explain_verbose
       @@explain_verbose = nil
 
       private
@@ -152,21 +167,13 @@ module ActiveRecord
           spent = Time.now - start_time
 
           if @logger and @logger.level <= Logger::INFO
-           select_logger(@spent, @logger.silence do
-             format_log_entry("Analyzing #{name} Execution Time: #{@spent}\n\n",
+            select_logger(@spent, @logger.silence do
+             format_log_entry("Analyzing #{name} Execution Time: #{spent}\n\n",
              "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} "+
              "#{'verbose' if @@explain_verbose} #{sql}", name).qa_pgrows}\n")
            end) if sql =~ /^select/i
           end
         query_results
-        end
-
-        def select_logger time_spent, log
-          case time_spent
-          when 0..2 then @logger.debug(log)
-          when 3..7 then @logger.warn(log)
-          else @logger.fatal(log)
-          end
         end
 
     end

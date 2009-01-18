@@ -139,4 +139,4 @@ http://habtm.com/articles/2006/06/10/pretty-tables-for-ruby-objects
 PostgreSQL and Oracle Adapter from Luca Mearelli
 http://spazidigitali.com
 
-Released under the MIT license (download your own if you need it)
+Released under the MIT license
