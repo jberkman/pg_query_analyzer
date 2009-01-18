@@ -2,23 +2,29 @@
 
 MODIFIED by John Eberly originally take from http://svn.nfectio.us
 
-The Query Analyzer plugin will expand the usability of your log files
-by providing query analysis using the MySQL query execution plan. Each SQL
-select query will be 'EXPLAIN'ed and added to the log files right below
-the original query.
+PG/ORACLE by Luca Mearelli
+
+Cooked and gemified by Marcos Piccinini
+
+The Query Analyzer plugin will expand the usability of your log files and/or
+console by providing your dbms`s query analysis.
+
+Each SQL select query 'EXPLAIN' is and added right below the original query.
 
 Using this plugin and a good understanding of the results, you will be
 able to analyze and optimize the queries your application is making.
 
-Refer to your dbms manual for more information on understanding the results.
+Refer to your DBMS manual for more information on understanding the results.
 
-== Installation
+
+== Install
 
   gem install nofxx-query_analyzer
 
 config/enviroments/development.rb
 
   config.gem "nofxx-query_analyzer", :lib => "query_analyzer"
+
 
 == Example Use
 
@@ -37,6 +43,7 @@ select_type | key_len | type   | Extra       | id | possible_keys | rows | table
 ----------------------------------------------------------------------------------------------------
 SIMPLE      |         | ALL    | Using where | 1  |               | 74   |    d   |        |
 SIMPLE      | 4       | eq_ref | Using where | 1  | PRIMARY       | 1    |    p   | d.p_id | PRIMARY
+
 
 
 == Analyze the results

@@ -4,6 +4,7 @@ PostInstall.txt
 README.rdoc
 Rakefile
 lib/query_analyzer.rb
+rails/init.rb
 script/console
 script/destroy
 script/generate
