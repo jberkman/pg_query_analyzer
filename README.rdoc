@@ -20,7 +20,7 @@ config/enviroments/development.rb
   config.gem "nofxx-query_analyzer", :lib => "query_analyzer"
 
 
-== Example Use
+== Example Use (MySQL)
 
 Here is a real life usage of the plugin that detected the omission of indexes on
 a table. In this case, it was a join table and the keys didn't have indexes (silly me!).
@@ -55,20 +55,21 @@ or unique column.
 Lets add some indexes to the join table and see if we can cut that full table scan down in the
 number of rows it needs to search.
 
-#> script/generate Migration AddIndexesToD
+  script/generate Migration AddIndexesToD
 
 # file: 005_add_indexes_to_d
-class AddIndexesToD < ActiveRecord::Migration
-  def self.up
-    add_index :d, [ :p_id, :type ]
-    add_index :d, :type
-  end
 
-  def self.remove
-    remove_index :d, [ :p_id, :type ]
-    remove_index :d, :type
+  class AddIndexesToD < ActiveRecord::Migration
+    def self.up
+      add_index :d, [ :p_id, :type ]
+      add_index :d, :type
+    end
+
+    def self.remove
+      remove_index :d, [ :p_id, :type ]
+      remove_index :d, :type
+    end
   end
-end
 
 
 Now that we have an index on the foreign_key column and type, lets re-run the query and
@@ -88,6 +89,21 @@ SIMPLE      | 4       | eq_ref | Using where | 1  | PRIMARY                     
 
 Okay. Now MySQL is using an index satisfy the WHERE condition. Using the index, it was able to
 find the single row that matched, preventing the full table scan.
+
+
+== PostgreSQL
+
+Some options:
+
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.explain_analyze = true
+
+If true then uses the ANALYZE option which (from postgresql manual):
+Carry out the command and show the actual run times.
+
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.explain_verbose = true
+
+If true then uses the VERBOSE option which  (from postgresql manual):
+Shows the full internal representation of the plan tree, rather than a summary.
 
 
 == Credits:

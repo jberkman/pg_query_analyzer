@@ -144,16 +144,14 @@ module ActiveRecord
         def select(sql, name = nil)
           query_results = select_without_analyzer(sql, name)
 
-         if @logger and @logger.level <= Logger::INFO
-          @logger.debug(@logger.silence do
-            format_log_entry("Analyzing #{name}\n",
-            "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} #{'verbose' if @@explain_verbose} #{sql}", name).qa_columnized}\n")
-          end) if sql =~ /^select/i
-         end
-
+          if @logger and @logger.level <= Logger::INFO
+           @logger.debug(@logger.silence do
+             format_log_entry("Analyzing #{name}\n\n",
+             "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} "+
+             "#{'verbose' if @@explain_verbose} #{sql}", name).qa_columnized}\n")
+           end) if sql =~ /^select/i
+          end
         query_results
-
-
         end
 
     end
