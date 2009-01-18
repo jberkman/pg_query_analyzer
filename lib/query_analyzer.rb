@@ -17,7 +17,7 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 module QueryAnalyzer
-  VERSION = '0.1.2'
+  VERSION = '0.1.5'
 end
 
 class Array
@@ -48,13 +48,9 @@ class Array
   end
 
   def qa_pgrows
-    out = []
-    self.each_with_index do |row, i|
-      out[i] = " " * i
-      row.values.each_with_index { |value, j| out[i] << "#{" " * j} -> #{value}\n" }
-    end
-    out.join("\n  ")
+    self.map(&:values).join("\n ")
   end
+
 end
 
 #
@@ -151,16 +147,26 @@ module ActiveRecord
         alias_method :select_without_analyzer, :select
 
         def select(sql, name = nil)
+          start_time = Time.now
           query_results = select_without_analyzer(sql, name)
+          spent = Time.now - start_time
 
           if @logger and @logger.level <= Logger::INFO
-           @logger.debug(@logger.silence do
-             format_log_entry("Analyzing #{name}\n\n",
+           select_logger(@spent, @logger.silence do
+             format_log_entry("Analyzing #{name} Execution Time: #{@spent}\n\n",
              "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} "+
              "#{'verbose' if @@explain_verbose} #{sql}", name).qa_pgrows}\n")
            end) if sql =~ /^select/i
           end
         query_results
+        end
+
+        def select_logger time_spent, log
+          case time_spent
+          when 0..2 then @logger.debug(log)
+          when 3..7 then @logger.warn(log)
+          else @logger.fatal(log)
+          end
         end
 
     end

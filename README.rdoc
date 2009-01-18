@@ -93,6 +93,21 @@ find the single row that matched, preventing the full table scan.
 
 == PostgreSQL
 
+Output example:
+
+  Analyzing Car Load Execution Time:
+
+   Hash Join  (cost=8.01..21.90 rows=6 width=2699)
+   Hash Cond: (cars.group_id = group.id)
+   ->  Seq Scan on cars  (cost=0.00..12.80 rows=280 width=2699)
+   ->  Hash  (cost=8.00..8.00 rows=1 width=8)
+       ->  Hash Join  (cost=3.90..8.00 rows=1 width=8)
+             Hash Cond: (groups.id = contracts.group_id)
+             ->  Seq Scan on groups  (cost=0.00..3.79 rows=79 width=4)
+             ->  Hash  (cost=3.89..3.89 rows=1 width=4)
+                   ->  Seq Scan on contracts  (cost=0.00..3.89 rows=1 width=4)
+                         Filter: (user_id = 8)
+
 Some options:
 
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.explain_analyze = true
@@ -107,6 +122,7 @@ Shows the full internal representation of the plan tree, rather than a summary.
 
 
 == Credits:
+
 
 MODIFIED by John Eberly originally take from http://svn.nfectio.us
 
