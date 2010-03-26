@@ -11,9 +11,11 @@ tools like this typically leads to the best results.
 == Instructions
 
 Install the gem:
+
   sudo gem install pg_query_analyzer
 
 Require it development (config/enviroments/development.rb):
+
   config.gem "pg_query_analyzer"
 
 You'll achieve the best results if you have your production database available
@@ -31,9 +33,10 @@ your logs to ensure that you're getting the results you expect. Once you're
 finished, you can comment out or remove the config.gem call.
 
 Read more about database indexes here:
-http://www.therailsway.com/2006/11/21/tracks-part-4
-http://blog.evanweaver.com/articles/2007/02/12/table-indexes-in-rails/
-http://github.com/eladmeidar/rails_indexes
+
+  http://www.therailsway.com/2006/11/21/tracks-part-4
+  http://blog.evanweaver.com/articles/2007/02/12/table-indexes-in-rails/
+  http://github.com/eladmeidar/rails_indexes
 
 
 == Example One
@@ -61,7 +64,7 @@ http://github.com/eladmeidar/rails_indexes
   ->  Seq Scan on feed_items  (cost=0.00..236.62 rows=290 width=32) (actual time=0.015..1.735 rows=290 loops=1)
         Output: id, user_id, post_id, poster_id, post_created_at, created_at
         Filter: (user_id = 2)
-Total runtime: 1.948 ms
+  Total runtime: 1.948 ms
 
 
 == Credits
@@ -76,7 +79,7 @@ PostgreSQL Only Version from Trevor Turk http://github.com/trevorturk/pg_query_a
 
 Spatial Adapter Copyright (c) 2006 Guilhem Vellut <guilhem.vellut+georuby@gmail.com>
 PostGis Adapter Functions (c) 2008 Marcos Piccinini <nofxx>
-PostgreSQL Only Version   (c) 2010 Trevor Turk <trevorturk>
+PostgreSQL Only Version   (c) 2010 Trevor Turk <trevorturk@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
