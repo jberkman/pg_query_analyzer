@@ -1,1 +1,1 @@
-require 'query_analyzer'
+require 'pg_query_analyzer'

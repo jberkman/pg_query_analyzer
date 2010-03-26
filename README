@@ -1,0 +1,98 @@
+== PostgreSQL Query Analyzer for Rails
+
+Provides a PostgreSQL query analysis in your development logs. 
+
+This is useful for finding indexes that your database may benefit from. There 
+are alternatives available that guess which indexes may help and provide 
+example migrations, but I've found that performing a manual analysis using
+tools like this typically leads to the best results. 
+
+
+== Instructions
+
+Install the gem:
+  sudo gem install pg_query_analyzer
+
+Require it development (config/enviroments/development.rb):
+  config.gem "pg_query_analyzer"
+
+You'll achieve the best results if you have your production database available
+locally. If you're using Heroku (http://heroku.com) this means setting up your
+development database to use PostgreSQL and running ("heroku db:pull").
+
+Restart your server ("script/server" or "touch tmp/restart.txt") and tail your
+development log ("tail -f -n 100 log/development.log") to see the results. Note
+the "total runtime", "cost", and "actual time" data points to locate long 
+running queries, as you might see in the second example provided below.
+
+Once you identify which queries are worth optimizing, you can generate and run 
+migrations to create the appropriate indexes, restart your server, and check 
+your logs to ensure that you're getting the results you expect. Once you're 
+finished, you can comment out or remove the config.gem call.
+
+Read more about database indexes here:
+http://www.therailsway.com/2006/11/21/tracks-part-4
+http://blog.evanweaver.com/articles/2007/02/12/table-indexes-in-rails/
+http://github.com/eladmeidar/rails_indexes
+
+
+== Example One
+
+  User Load (2.5ms)   SELECT * FROM "users" WHERE ("users"."id" = 2) LIMIT 1
+  Analyzing User Load Execution Time: 0.002899
+
+  Limit  (cost=0.00..8.27 rows=1 width=3734) (actual time=0.012..0.012 rows=1 loops=1)
+  Output: id, login, posts_count, followings_count, followers_count, created_at, updated_at,...
+  ->  Index Scan using users_pkey on users  (cost=0.00..8.27 rows=1 width=3734) (actual time=0.011..0.011 rows=1 loops=1)
+        Output: id, login, posts_count, followings_count, followers_count, created_at, updated_at...
+        Index Cond: (id = 2)
+  Total runtime: 0.052 ms
+
+
+== Example Two
+
+  FeedItem Load (5.1ms)   SELECT * FROM "feed_items" WHERE ("feed_items".user_id = 2) ORDER BY feed_items.post_created_at DESC
+  Analyzing FeedItem Load Execution Time: 0.014169
+
+  Sort  (cost=248.49..249.21 rows=290 width=32) (actual time=1.870..1.895 rows=290 loops=1)
+  Output: id, user_id, post_id, poster_id, post_created_at, created_at
+  Sort Key: post_created_at
+  Sort Method:  quicksort  Memory: 47kB
+  ->  Seq Scan on feed_items  (cost=0.00..236.62 rows=290 width=32) (actual time=0.015..1.735 rows=290 loops=1)
+        Output: id, user_id, post_id, poster_id, post_created_at, created_at
+        Filter: (user_id = 2)
+Total runtime: 1.948 ms
+
+
+== Credits
+
+MODIFIED by John Eberly originally take from http://svn.nfectio.us
+PostgreSQL and Oracle Adapter from Luca Mearelli http://spazidigitali.com
+Cooked and gemified by Marcos Piccinini http://github.com/nofxx/query-analyzer
+PostgreSQL Only Version from Trevor Turk http://github.com/trevorturk/pg_query_analyzer
+
+
+== MIT License
+
+Spatial Adapter Copyright (c) 2006 Guilhem Vellut <guilhem.vellut+georuby@gmail.com>
+PostGis Adapter Functions (c) 2008 Marcos Piccinini <nofxx>
+PostgreSQL Only Version   (c) 2010 Trevor Turk <trevorturk>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
