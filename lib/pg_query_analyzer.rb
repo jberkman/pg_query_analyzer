@@ -1,7 +1,9 @@
+require 'active_record/connection_adapters/postgresql_adapter'
+
 module ActiveRecord
   module ConnectionAdapters
     class PostgreSQLAdapter < AbstractAdapter
-      
+        
       @@analyzer_debug = 0..2
       @@analyzer_warn  = 3..7
 
@@ -18,14 +20,32 @@ module ActiveRecord
 
       # VERBOSE shows the full plan tree, rather than a summary.
       @@explain_verbose = true # use nil to disable
+      
+      def format_log_entry(message, dump = nil)
+        if Rails.application.config.colorize_logging
+          if @@row_even
+            @@row_even = false
+            message_color, dump_color = "4;36;1", "0;1"
+          else
+            @@row_even = true
+            message_color, dump_color = "4;35;1", "0"
+          end
+
+          log_entry = "  \e[#{message_color}m#{message}\e[0m   "
+          log_entry << "\e[#{dump_color}m%#{String === dump ? 's' : 'p'}\e[0m" % dump if dump
+          log_entry
+        else
+          "%s  %s" % [message, dump]
+        end
+      end
 
       private
 
       alias_method :select_without_analyzer, :select
 
-      def select(sql, name = nil)
+      def select(sql, name = nil, binds = [])
         start_time = Time.now
-        query_results = select_without_analyzer(sql, name)
+        query_results = select_without_analyzer(sql, name, binds)
         spent = Time.now - start_time
 
         if @logger and @logger.level <= Logger::INFO
