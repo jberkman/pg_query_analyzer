@@ -6,6 +6,7 @@ module ActiveRecord
         
       @@analyzer_debug = 0..2
       @@analyzer_warn  = 3..7
+      @@row_even = false
 
       def select_logger time_spent, log
         case time_spent
