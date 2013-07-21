@@ -53,7 +53,7 @@ module ActiveRecord
           select_logger(@spent, @logger.silence do
            format_log_entry("Analyzing #{name} Execution Time: #{spent}\n\n",
            "#{select_without_analyzer("explain #{'analyze' if @@explain_analyze} "+
-           "#{'verbose' if @@explain_verbose} #{sql}", name).map(&:values).join("\n ")}\n")
+           "#{'verbose' if @@explain_verbose} #{sql}", name, binds).map(&:values).join("\n ")}\n")
          end) if sql =~ /^select/i
         end
       query_results
